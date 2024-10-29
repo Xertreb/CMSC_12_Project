@@ -1,3 +1,8 @@
+import sys
+sys.path.insert(0, './')
+
+import functions as func
+
 class Save:
     def __init__ (self, username, level, wave, items, equipment, difficulty):
         self.username = username
@@ -18,21 +23,11 @@ class Save:
         return self
 
 class Unit:
-    # stat bonus
-    self.atkB = 0
-    self.defB = 0
-    self.spdB = 0
-
-    # actual Stats
-    self.atkA = lambda: self.atkB + self.atk
-    self.defA = lambda: self.defB + self.df
-    self.spdA = lambda: self.spdB + self.spd
-
     def __init__ (
         self,
         name,
         level,
-        hp,
+        maxhp,
         atk,
         df,
         spd,
@@ -40,14 +35,26 @@ class Unit:
     ) :
         self.name = name
         self.level = level
-        self.hp = hp
-        self.atk = atk
-        self.df = df
-        self.spd = spd
-        self.id = id
+        self.maxhp = maxhp
+        self.hp = maxhp
+        self.atk = lambda: 5
+        self.df = lambda: 3
+        self.spd = lambda: 3
+        self.id = id 
+        
+        # stat bonus
+        self.atkB = 0
+        self.defB = 0
+        self.spdB = 0
+
+        # actual Stats
+        self.atkA = lambda: self.atkB + self.atk()
+        self.defA = lambda: self.defB + self.df()
+        self.spdA = lambda: self.spdB + self.spd()
 
     def Attack(self, x, multiplier = 1):
-        x.hp -= (self.atk * multiplier) - (x.df * 0.8)
+        x.hp -= (self.atkA() * multiplier) - (x.defA() * 0.8) + 1
+        print(self.name, "dealt", str((self.atkA() * multiplier) - (x.defA() * 0.8) + 1), "damage to " + x.name+".", sep = " ")
         return self
     
     def Heal(self, hpHealed, isPercent):
@@ -60,34 +67,62 @@ class Unit:
     def Buff(self, stat, statBonus, isPercent):
         if stat == 0:
             if isPercent:
-                self.atk += self.atk * statBonus
+                self.atkB += self.atk() * statBonus
             else:
-                self.atk += statBonus
+                self.atkB += statBonus
         elif stat == 1:
             if isPercent:
-                self.df += self.df * statBonus
+                self.defB += self.defA()() * statBonus
             else:
-                self.df += statBonus
+                self.defB += statBonus
         elif stat == 2:
             if isPercent:
-                self.spd += self.atk * statBonus
+                self.spdB += self.spd() * statBonus
             else:
-                self.spd += statBonus
+                self.spdB += statBonus
         return self
-        
 
 class Player(Unit):
-    self.items = []
-    self.equipment = []
-    self.itemsInEffect = []
+    def __init__ (self, name, level):
+        self.name = name
+        self.level = level
+        self.maxhp = lambda: round(self.level * 2.5 + 7.5)
+        self.hp = self.maxhp()
+        self.atk = lambda: round(self.level * 1.5 + 5)
+        self.df = lambda: round(self.level * 0.75 + 3)
+        self.spd = lambda: round(self.level * 1.25 + 4)
+        
+        self.items = []
+        self.equipment = []
+        self.itemsInEffect = []
+        
+        # stat bonus
+        self.atkB = 0
+        self.defB = 0
+        self.spdB = 0
+
+        # actual Stats
+        self.atkA = lambda: self.atkB + self.atk()
+        self.defA = lambda: self.defB + self.df()
+        self.spdA = lambda: self.spdB + self.spd()
 
     # base stat
-    self.atk = lambda: self.level * 1.5 + 5
-    self.df = lambda: self.level * 0.75 + 3
-    self.spd = lambda: self.level * 1.25 + 4
 
     def recalculateStatBonus(self):
         pass
 
-    def Item(self, ):
+    def Item(self):
+        pass
+
+    def Attack(self, x, category, multiplier = 1):
+        if func.askQuestion(category):
+            x.hp -= (self.atkA() * multiplier) - (x.defA() * 0.8) + 1
+            print(self.name, "dealt", str((self.atkA() * multiplier) - (x.defA() * 0.8) + 1), "damage to " + x.name+".", sep = " ")
+        else:
+            x.hp -= (self.atkA()*0.5) - x.defA() * 0.8 + 1
+            print(self.name, "dealt", str((self.atkA()*0.5) - x.defA() * 0.8 + 1), "damage to " + x.name+".", sep = " ")
+        
+
+class Boss(Unit):
+    def Summon(EntityList):
         pass

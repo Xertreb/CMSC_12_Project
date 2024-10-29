@@ -27,21 +27,45 @@ Turn-based Rougelike Trivia RPG
         
 def gameMain():
     global save, player
-    entities = [player]
-    entities.append(waveStart())
-    # check all HP
+    entities = []
+    entities.append(cl.Unit("Rat", 3, 10, 5, 3, 1, 1))
+    entities.append(cl.Unit("Rat", 3, 10, 5, 5, 3, 1))
+    #entities.append(waveStart())
 
-    for x in entities:
-        pass
+    entities.sort(key = lambda n: n.spd(), reverse = True)
 
+    while len(entities) > 0:
+        playerMove = False
+        i = 0
+        while i < len(entities):
+            if player.spd() >= entities[i].spd() and playerMove == False:
+                choice = func.loopValidChoice(range(1,3), "[1] Attack\n[2] Item\nAction: ")
+                if choice == 1:
+                    strDisplay = ""
+                    for ind, j in enumerate(entities):
+                        strDisplay += "[" + str(ind + 1) + "] " + j.name + " (HP: " + str(j.hp) + "/" + str(j.maxhp) + ")\n"
+                    
+                    choiceAttack = func.loopValidChoice(range(1, len(entities) + 1), strDisplay + "Target: " )
+
+                    player.Attack(entities[choiceAttack-1], "General Knowledge")
+                    if entities[choiceAttack-1].hp <= 0:
+                        entities.pop(choiceAttack-1)
+                        if choiceAttack -1 < i:
+                            i -= 1
+                else:
+                    pass
+                
+                playerMove = True
+            else:
+                entities[i].Attack(player)
+                i += 1
 
 
 def waveStart():
-    #select topic
     pass
 
 
 
-player = None
+player = cl.Player("Test", 1)
 save = None
-main()
+gameMain()
