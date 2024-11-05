@@ -92,6 +92,7 @@ class Player(Unit):
         self.df = lambda: round(self.level * 0.75 + 3)
         self.spd = lambda: round(self.level * 1.25 + 4)
         
+        
         self.items = []
         self.equipment = []
         self.itemsInEffect = []

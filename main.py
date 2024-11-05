@@ -64,6 +64,14 @@ def gameMain():
 def waveStart():
     pass
 
+def NewSave():
+    global player
+
+    player_name = input("Enter Player Name: ")
+    player = cl.Player(player_name, 1)
+
+def UploadSave ():
+    global player
 
 
 player = cl.Player("Test", 1)

@@ -1,6 +1,8 @@
 import sys
 sys.path.insert(0, './Questions/')
+sys.path.insert(0, './Classes/')
 import random
+import classes as cl
 
 # minor functions
 def loopValidChoice(ran, text=''):
@@ -16,8 +18,10 @@ def initCategories():
     f = open('Questions/categories.txt', 'r')
 
     for x in f:
-        categories.append(x)
+        categories.add(x)
     f.close()
+
+    categories = list(categories)
 
 def askQuestion(category):
     fq = open("Questions/" + category + "Q.txt", 'r')
@@ -45,6 +49,5 @@ def askQuestion(category):
     else:
         return False
     
-
 categories = []
 initCategories()
