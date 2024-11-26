@@ -15,17 +15,43 @@ def loopValidChoice(ran, text=''):
 # questions
 
 def initCategories():
+    categories = []
     f = open('Questions/categories.txt', 'r')
 
     for x in f:
-        categories.add(x)
+        categories.append(x)
     f.close()
 
     categories = list(categories)
+    categories = [x[:-1] for x in categories]
 
-def askQuestion(category):
-    fq = open("Questions/" + category + "Q.txt", 'r')
-    fa = open("Questions/" + category + "A.txt", 'r')
+    f = open("Questions/category_text.txt", 'r')
+    
+    cat_txt = {}
+
+    i = 0
+    cat_txt[i] = []
+    for x in f:
+        x = x[:-1]
+        if x != ":&:":
+            cat_txt[i].append(x)
+        else:
+            i += 1
+            cat_txt[i] = []
+    
+    del cat_txt[len(cat_txt.keys())-1]
+    #print(cat_txt)
+
+    f.close()
+
+    return categories, cat_txt
+
+
+
+def askQuestion(category, difficulty):
+    diffTxt = ["E", "M", "H"]
+    fq = open("Questions/" + category + "_" + diffTxt[difficulty] +"_Q.txt", 'r')
+    fa = open("Questions/" + category +  "_" + diffTxt[difficulty] +"_A.txt", 'r')
 
     qlist = []
     alist = []
@@ -48,6 +74,3 @@ def askQuestion(category):
         return True
     else:
         return False
-    
-categories = []
-initCategories()

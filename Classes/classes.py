@@ -115,8 +115,11 @@ class Player(Unit):
     def Item(self):
         pass
 
-    def Attack(self, x, category, multiplier = 1):
-        if func.askQuestion(category):
+    def Attack(self, x, category, diff = 0):
+        diffBonus = [1, 1.3, 1.5]
+        multiplier = diffBonus[diff-1]
+
+        if func.askQuestion(category, diff):
             x.hp -= (self.atkA() * multiplier) - (x.defA() * 0.8) + 1
             print(self.name, "dealt", str((self.atkA() * multiplier) - (x.defA() * 0.8) + 1), "damage to " + x.name+".", sep = " ")
         else:
