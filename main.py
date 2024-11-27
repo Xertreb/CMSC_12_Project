@@ -5,6 +5,8 @@ sys.path.insert(0, './Saves/')
 
 import classes as cl
 import functions as func
+import entities as ent
+import copy as cp
 
 import random as rand
 
@@ -27,25 +29,21 @@ Turn-based Rougelike Trivia RPG
     if choice == 2:
         LoadSave()
         
-def gameLoop(category):
+def gameLoop(category, entities, wave):
     global save, player
-    entities = []
-    entities.append(cl.Unit("Rat", 3, 10, 5, 3, 1, 1))
-    entities.append(cl.Unit("Rat", 3, 10, 5, 5, 3, 1))
-    #entities.append(waveStart())
 
-    entities.sort(key = lambda n: n.spd(), reverse = True)
+    entities.sort(key = lambda n: n.spd(n.level(wave)), reverse = True)
 
     while len(entities) > 0:
         playerMove = False
         i = 0
         while i < len(entities):
-            if player.spd() >= entities[i].spd() and playerMove == False:
+            if player.spd() >= entities[i].spd(entities[i].level(wave)) and playerMove == False:
                 choice = func.loopValidChoice(range(1,3), "[1] Attack\n[2] Item\nAction: ")
                 if choice == 1:
                     strDisplay = ""
                     for ind, j in enumerate(entities):
-                        strDisplay += "[" + str(ind + 1) + "] " + j.name + " (HP: " + str(j.hp) + "/" + str(j.maxhp) + ")\n"
+                        strDisplay += "[" + str(ind + 1) + "] " + j.name + " (HP: " + str(j.hp) + "/" + str(j.maxhp(j.level(j.wave))) + ")\n"
                     
                     choiceAttack = func.loopValidChoice(range(1, len(entities) + 1), strDisplay + "Target: " )
                     choice = func.loopValidChoice(range(1,4), "[1] Easy (x1) \n[2] Normal (x1.3) \n[3] Hard (x1.5)\nAction: ") - 1
@@ -67,8 +65,14 @@ def gameLoop(category):
     return True
 
 
-def waveStart():
+def waveStart(wave):
     # category select
+
+    entities = []
+    for x in range (3):
+        i = rand.randint(1, 9)
+        entities.append(cp.deepcopy(ent.normal_enemies[i]))
+        entities[x].SetWave(wave)
 
     cats = []
     displayStr = ""
@@ -80,7 +84,7 @@ def waveStart():
     displayStr += "Choose a Room: "
     choice = func.loopValidChoice(range(1, 4), displayStr)
 
-    return gameLoop(categories[cats[choice-1]])
+    return gameLoop(categories[cats[choice-1]], entities, wave)
     
 
 def NewSave():
@@ -94,8 +98,11 @@ def UploadSave ():
 
 def gameMain():
     nextWave = True
+    wave = 0
     while nextWave:
-        nextWave = waveStart()
+        wave += 1
+        nextWave = waveStart(wave)
+    
 
 
 player = cl.Player("Test", 1)

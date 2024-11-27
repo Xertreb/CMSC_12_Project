@@ -40,7 +40,7 @@ def initCategories():
             cat_txt[i] = []
     
     del cat_txt[len(cat_txt.keys())-1]
-    #print(cat_txt)
+#print(cat_txt)
 
     f.close()
 
@@ -61,7 +61,7 @@ def askQuestion(category, difficulty):
     for x in fa:
         alist.append(x[0:-1])
 
-    num = random.randint(0, len(qlist))
+    num = random.randint(0, len(qlist)-1)
     q = qlist[num]
     a = alist[num]
 

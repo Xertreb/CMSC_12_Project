@@ -31,16 +31,16 @@ class Unit:
         atk,
         df,
         spd,
-        id
+        id,
     ) :
         self.name = name
         self.level = level
         self.maxhp = maxhp
-        self.hp = maxhp
-        self.atk = lambda: 5
-        self.df = lambda: 3
-        self.spd = lambda: 3
+        self.atk = atk
+        self.df = df
+        self.spd = spd
         self.id = id 
+        self.wave = 0
         
         # stat bonus
         self.atkB = 0
@@ -48,9 +48,14 @@ class Unit:
         self.spdB = 0
 
         # actual Stats
-        self.atkA = lambda: self.atkB + self.atk()
-        self.defA = lambda: self.defB + self.df()
-        self.spdA = lambda: self.spdB + self.spd()
+        self.atkA = lambda: self.atkB + self.atk(self.level(self.wave))
+        self.defA = lambda: self.defB + self.df(self.level(self.wave))
+        self.spdA = lambda: self.spdB + self.spd(self.level(self.wave))
+
+
+    def SetWave (self, wave):
+        self.wave = 0
+        self.hp = self.maxhp(self.level(self.wave))
 
     def Attack(self, x, multiplier = 1):
         x.hp -= (self.atkA() * multiplier) - (x.defA() * 0.8) + 1
@@ -86,11 +91,11 @@ class Player(Unit):
     def __init__ (self, name, level):
         self.name = name
         self.level = level
-        self.maxhp = lambda: round(self.level * 2.5 + 7.5)
+        self.maxhp = lambda: round(self.level * 5 + 7.5)
         self.hp = self.maxhp()
-        self.atk = lambda: round(self.level * 1.5 + 5)
-        self.df = lambda: round(self.level * 0.75 + 3)
-        self.spd = lambda: round(self.level * 1.25 + 4)
+        self.atk = lambda: round(self.level * 6 + 5)
+        self.df = lambda: round(self.level * 3 + 4)
+        self.spd = lambda: round(self.level *  3 + 7)
         
         
         self.items = []
