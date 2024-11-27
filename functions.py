@@ -3,12 +3,16 @@ sys.path.insert(0, './Questions/')
 sys.path.insert(0, './Classes/')
 import random
 import classes as cl
+import math
 
 # minor functions
 def loopValidChoice(ran, text=''):
-    x = input(text)
+    print(text)
+    x = input()
+    print("\n")
     while not (x.isdigit() and int(x) in ran):
-        x = input(text)
+        x = input()
+        print("\n")
     
     return int(x)
 
@@ -74,3 +78,19 @@ def askQuestion(category, difficulty):
         return True
     else:
         return False
+
+def ProgressBar (v, max, size=10):
+    #[==========] 
+    text = "["
+    percent = v/max
+    p1 = math.floor(percent * size)
+    p2 = int(percent * size*100)/100
+    
+    text += "=" * int(p1)
+    if p1 < p2:
+        text += "-" 
+        text += " " * int(size-p1-1)
+    else:
+        text += " " * int(size-p1)
+    text += "]"
+    return text

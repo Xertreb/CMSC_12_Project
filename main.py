@@ -32,9 +32,68 @@ Turn-based Rougelike Trivia RPG
 def gameLoop(category, entities, wave):
     global save, player
 
-    entities.sort(key = lambda n: n.spd(n.level(wave)), reverse = True)
+    lambda x: 100**(-1/x.spd(x.level(wave)))-x.spd(x.level(wave))**0.6+100
 
+    entities = [[x, x.spd(x.level(x.wave))] for x in entities]
+    entities.sort(key = lambda x: x[1])
+
+    i = 1
     while len(entities) > 0:
+        print("Turn " + str(i))
+        print("Turn Order")
+
+        # display turn order
+        i = 0
+        p = False
+        while i < len(entities):
+            if player.spd() >= entities[i][1] and not p:
+                text = "("+ str(player.hp) +"/" + str(player.maxhp()) + ")"
+                print(player.name + ": "  + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[:5] + text + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[-5:])
+                p = True
+            else:
+                hp = entities[i][0].hp
+                mhp = entities[i][0].maxhp(entities[i][0].level(wave))
+                text = "("+ str(hp) +"/" + str(mhp) + ")"
+                print(entities[i][0].name + ": "  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
+                i+=1
+        
+        # action
+        actions = []
+        choice = func.loopValidChoice(range(1,3), "\n[1] Attack\n[2] Item\nAction: ")
+        actions.append(choice)
+        if choice == 1:
+            strDisplay = ""
+            for i in range(len(entities)):
+                hp = entities[i][0].hp
+                mhp = entities[i][0].maxhp(entities[i][0].level(wave))
+                text = "("+ str(hp) +"/" + str(mhp) + ")"
+                print("[" + str(i + 1)+"] " + entities[i][0].name + ": "  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
+            choiceAttack = func.loopValidChoice(range(1, len(entities) + 1), strDisplay + "Target: " )
+            actions.append(choiceAttack)
+            
+            choice = func.loopValidChoice(range(1,4), "[1] Easy (x1) \n[2] Normal (x1.3) \n[3] Hard (x1.5)\nAction: ") - 1
+            actions.append(choice)
+            
+
+        print("Turn Start!")
+        i = 0
+        pSpd = player.spd()
+        while i < len(entities):
+            if pSpd > entities[i][1]:
+                if actions[0] == 1:
+                    player.Attack(entities[actions[1]-1][0], category, actions[2])
+                    if entities[actions[1]-1][0].hp <= 0:
+                        entities.pop(actions[1]-1)
+                        if choiceAttack - 1 < i:
+                            i -= 1
+            else:
+                entities[i].Attack(player)
+                i += 1
+            if player.hp <= 0:
+                return False      
+
+    '''while len(entities) > 0:
+        break
         playerMove = False
         i = 0
         while i < len(entities):
@@ -61,7 +120,7 @@ def gameLoop(category, entities, wave):
                 entities[i].Attack(player)
                 i += 1
                 if player.hp <= 0:
-                    return False
+                    return False'''
     return True
 
 
