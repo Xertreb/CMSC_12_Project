@@ -33,9 +33,10 @@ def gameLoop(category, entities, wave):
     global save, player
 
     lambda x: 100**(-1/x.spd(x.level(wave)))-x.spd(x.level(wave))**0.6+100
+    expG = sum([round(3*(x.level(x.wave))*(rand.random()**(1/2))) for x in entities])
 
     entities = [[x, x.spd(x.level(x.wave))] for x in entities]
-    entities.sort(key = lambda x: x[1])
+    entities.sort(reverse=True, key = lambda x: x[1])
 
     i = 1
     while len(entities) > 0:
@@ -45,82 +46,88 @@ def gameLoop(category, entities, wave):
         # display turn order
         i = 0
         p = False
+        order = []
         while i < len(entities):
             if player.spd() >= entities[i][1] and not p:
                 text = "("+ str(player.hp) +"/" + str(player.maxhp()) + ")"
-                print(player.name + ": "  + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[:5] + text + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[-5:])
+                print(player.name + " (Lv. " + str(player.level)+ "): \t"  + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[:5] + text + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[-5:])
                 p = True
+                order.append(-1)
             else:
                 hp = entities[i][0].hp
                 mhp = entities[i][0].maxhp(entities[i][0].level(wave))
                 text = "("+ str(hp) +"/" + str(mhp) + ")"
-                print(entities[i][0].name + ": "  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
+                print(entities[i][0].name +  " (Lv. " + str(entities[i][0].level(wave))+ "): \t"  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
                 i+=1
+                order.append(i)
         
         # action
         actions = []
-        choice = func.loopValidChoice(range(1,3), "\n[1] Attack\n[2] Item\nAction: ")
-        actions.append(choice)
-        if choice == 1:
-            strDisplay = ""
-            for i in range(len(entities)):
-                hp = entities[i][0].hp
-                mhp = entities[i][0].maxhp(entities[i][0].level(wave))
-                text = "("+ str(hp) +"/" + str(mhp) + ")"
-                print("[" + str(i + 1)+"] " + entities[i][0].name + ": "  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
-            choiceAttack = func.loopValidChoice(range(1, len(entities) + 1), strDisplay + "Target: " )
-            actions.append(choiceAttack)
-            
-            choice = func.loopValidChoice(range(1,4), "[1] Easy (x1) \n[2] Normal (x1.3) \n[3] Hard (x1.5)\nAction: ") - 1
-            actions.append(choice)
+        choice1 = 0
+        while choice1 not in range(1, 3):
+            choice1 = func.loopValidChoice(range(1,4), "\n[1] Attack\n[2] Heal\n[3] Scan \nAction: ")
+            if choice1 == 1:
+                actions.append(choice1)
+                strDisplay = ""
+                for i in range(len(entities)):
+                    hp = entities[i][0].hp
+                    mhp = entities[i][0].maxhp(entities[i][0].level(wave))
+                    text = "("+ str(hp) +"/" + str(mhp) + ")"
+                    print("[" + str(i + 1)+"] " + entities[i][0].name + ": "  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
+                choiceAttack = func.loopValidChoice(range(1, len(entities) + 1), strDisplay + "Target: " )
+                actions.append(choiceAttack)
+                
+                choice = func.loopValidChoice(range(1,4), "[1] Easy (x1) \n[2] Normal (x1.3) \n[3] Hard (x1.5)\nAction: ") - 1
+                actions.append(choice)
+            elif choice1 == 2:
+                actions.append(choice1)
+                choice = func.loopValidChoice(range(1,4), "[1] Easy (10%) \n[2] Normal (20%) \n[3] Hard (30%)\nAction: ") - 1
+                actions.append(choice)
+            elif choice1 == 3:
+                for i in range(len(entities)):
+                    print("[" + str(i + 1)+"] " + entities[i][0].name)
+                choiceScan = func.loopValidChoice(range(1, len(entities) + 1), "Target: " ) -1
+                e = entities[choiceScan][0]
+                print(e.name)
+                print("HP:", str(e.hp) +"/"+str(e.maxhp(e.level(e.wave))))
+                print("ATK:", str(e.atkA()))
+                print("DEF:", str(e.defA()))
+                print("SPD:", str(e.spdA()))
+                input()
+                
+
+        #actions = [choice, choiceAttack, diff]
             
 
         print("Turn Start!")
-        i = 0
-        pSpd = player.spd()
-        while i < len(entities):
-            if pSpd > entities[i][1]:
+        for ind, i in enumerate(order):
+            if i == -1:
                 if actions[0] == 1:
+                    print(player.name, "attacks!")
                     player.Attack(entities[actions[1]-1][0], category, actions[2])
                     if entities[actions[1]-1][0].hp <= 0:
+                        print(entities[actions[1]-1][0].name, "died!")
                         entities.pop(actions[1]-1)
-                        if choiceAttack - 1 < i:
-                            i -= 1
+                if actions[0] == 2:
+                    print(player.name, "casts Heal!")
+                    player.Heal(category, actions[1])
             else:
-                entities[i].Attack(player)
-                i += 1
-            if player.hp <= 0:
-                return False      
-
-    '''while len(entities) > 0:
-        break
-        playerMove = False
-        i = 0
-        while i < len(entities):
-            if player.spd() >= entities[i].spd(entities[i].level(wave)) and playerMove == False:
-                choice = func.loopValidChoice(range(1,3), "[1] Attack\n[2] Item\nAction: ")
-                if choice == 1:
-                    strDisplay = ""
-                    for ind, j in enumerate(entities):
-                        strDisplay += "[" + str(ind + 1) + "] " + j.name + " (HP: " + str(j.hp) + "/" + str(j.maxhp(j.level(j.wave))) + ")\n"
-                    
-                    choiceAttack = func.loopValidChoice(range(1, len(entities) + 1), strDisplay + "Target: " )
-                    choice = func.loopValidChoice(range(1,4), "[1] Easy (x1) \n[2] Normal (x1.3) \n[3] Hard (x1.5)\nAction: ") - 1
-                    
-                    player.Attack(entities[choiceAttack-1], category, choice)
-                    if entities[choiceAttack-1].hp <= 0:
-                        entities.pop(choiceAttack-1)
-                        if choiceAttack -1 < i:
-                            i -= 1
+                if i <= len(entities):
+                    entities[i-1][0].Attack(player)
                 else:
-                    pass
-                
-                playerMove = True
-            else:
-                entities[i].Attack(player)
-                i += 1
-                if player.hp <= 0:
-                    return False'''
+                    continue
+            if player.hp <= 0:
+                return False   
+            input()
+    
+    print("Room Cleared!")
+    print(player.name + " gained " + str(expG) + " EXP!")
+    player.GainXP(expG)
+    if player.hp < player.maxhp():
+        player.hp += player.maxhp() * 0.5
+        if player.hp > player.maxhp():
+            player.hp = player.maxhp()
+    input()
     return True
 
 
@@ -128,10 +135,44 @@ def waveStart(wave):
     # category select
 
     entities = []
-    for x in range (3):
+
+    if wave < 5:
+        num = 1
+        r = rand.random()
+        if r >= 0.75:
+            num = 2
+        if r >= 0.95:
+            num = 3
+    elif wave < 7:
+        num = 1
+        r = rand.random()
+        if r >= 0.5:
+            num = 2
+        if r >= 0.75:
+            num = 3
+    elif wave < 10:
+        num = 2
+        r = rand.random()
+        if r >= 0.75:
+            num = 3
+    else:
+        num = 3
+    
+
+    
+    for x in range (num):
         i = rand.randint(1, 9)
         entities.append(cp.deepcopy(ent.normal_enemies[i]))
         entities[x].SetWave(wave)
+    
+    '''
+    entities.append(cp.deepcopy(ent.normal_enemies[1]))
+    entities[0].SetWave(wave)
+    entities.append(cp.deepcopy(ent.normal_enemies[2]))
+    entities[1].SetWave(wave)
+    entities.append(cp.deepcopy(ent.normal_enemies[7]))
+    entities[2].SetWave(wave)
+    '''
 
     cats = []
     displayStr = ""

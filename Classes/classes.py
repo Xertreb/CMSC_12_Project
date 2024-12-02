@@ -58,8 +58,12 @@ class Unit:
         self.hp = self.maxhp(self.level(self.wave))
 
     def Attack(self, x, multiplier = 1):
-        x.hp -= (self.atkA() * multiplier) - (x.defA() * 0.8) + 1
-        print(self.name, "dealt", str((self.atkA() * multiplier) - (x.defA() * 0.8) + 1), "damage to " + x.name+".", sep = " ")
+        dmg = round(((self.atkA() * multiplier) - (x.defA() * 0.8) + 1)*10)/10
+        if dmg <= 0:
+            dmg = 0
+        x.hp -= dmg
+        x.hp = round(x.hp*10)/10
+        print(self.name, "dealt", str(dmg), "damage to " + x.name+".", sep = " ")
         return self
     
     def Heal(self, hpHealed, isPercent):
@@ -91,11 +95,13 @@ class Player(Unit):
     def __init__ (self, name, level):
         self.name = name
         self.level = level
-        self.maxhp = lambda: round(self.level * 5 + 7.5)
+        self.maxhp = lambda: round(10*(1.06**(self.level+1))+0.5*self.level+8)
         self.hp = self.maxhp()
-        self.atk = lambda: round(self.level * 6 + 5)
-        self.df = lambda: round(self.level * 3 + 4)
-        self.spd = lambda: round(self.level *  3 + 7)
+        self.atk = lambda: round(3*(1.05**(self.level-1)) + 0.2*self.level+2)
+        self.df = lambda: round(3*((1.02)**(self.level-1))+0.05*self.level+1)
+        self.spd = lambda: round(5*((1.06)**self.level) + 0.7*self.level + 7)
+        self.exp = 0
+        self.expCap = lambda: round((1.01)**self.level+ 5* self.level - 1)
         
         
         self.items = []
@@ -112,24 +118,57 @@ class Player(Unit):
         self.defA = lambda: self.defB + self.df()
         self.spdA = lambda: self.spdB + self.spd()
 
-    # base stat
-
-    def recalculateStatBonus(self):
-        pass
-
-    def Item(self):
-        pass
-
     def Attack(self, x, category, diff = 0):
         diffBonus = [1, 1.3, 1.5]
-        multiplier = diffBonus[diff-1]
+        multiplier = diffBonus[diff]
 
         if func.askQuestion(category, diff):
-            x.hp -= (self.atkA() * multiplier) - (x.defA() * 0.8) + 1
-            print(self.name, "dealt", str((self.atkA() * multiplier) - (x.defA() * 0.8) + 1), "damage to " + x.name+".", sep = " ")
+            dmg = round(((self.atkA() * multiplier) - (x.defA() * 0.8) + 1)*10)/10
+            if dmg <= 0:
+                dmg = 0
+            x.hp -= dmg
+            x.hp = round(x.hp*10)/10
+            print(self.name, "dealt", str(dmg), "damage to " + x.name+".", sep = " ")
         else:
-            x.hp -= (self.atkA()*0.5) - x.defA() * 0.8 + 1
-            print(self.name, "dealt", str((self.atkA()*0.5) - x.defA() * 0.8 + 1), "damage to " + x.name+".", sep = " ")
+            dmg = round(((self.atkA()*0.5) - x.defA() * 0.8 + 1)*10)/10
+            if dmg <= 0:
+                dmg = 0
+            x.hp -= dmg
+            x.hp = round(x.hp*10)/10
+            print(self.name, "dealt", str(dmg), "damage to " + x.name+".", sep = " ")
+    
+    def GainXP(self, exp):
+        self.exp += exp
+        while self.expCap() < self.exp:
+            self.exp -= self.expCap()
+            self.level += 1
+            self.hp = self.maxhp()
+            print(self.name, "leveled up!")
+            print("Max HP:", self.maxhp())
+            print("ATK:", self.atk())
+            print("DEF:", self.df())
+            print("SPD:", self.spd())
+        print(self.exp, "until next level up.")
+
+
+    def Heal(self, category ,diff):
+        diffHeal = [0.1, 0.20, 0.3]
+
+        if func.askQuestion(category, diff):
+            heal = self.maxhp() * diffHeal[diff]
+            if heal + self.hp > self.maxhp():
+                heal = self.maxhp() - self.hp
+            heal = round(heal*10)/10
+            self.hp += heal
+            print(self.name + " healed for " + str(heal) + " HP!")
+        else:
+            heal = self.maxhp() * 0.05
+            if heal + self.hp > self.maxhp():
+                heal = self.maxhp() - self.hp
+            heal = round(heal*10)/10
+            self.hp += heal
+            print(self.name + " healed for " + str(heal) + " HP!")
+        
         
 
 class Boss(Unit):
