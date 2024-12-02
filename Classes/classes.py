@@ -102,12 +102,7 @@ class Player(Unit):
         self.spd = lambda: round(5*((1.06)**self.level) + 0.7*self.level + 7)
         self.exp = 0
         self.expCap = lambda: round((1.01)**self.level+ 5* self.level - 1)
-        
-        
-        self.items = []
-        self.equipment = []
-        self.itemsInEffect = []
-        
+               
         # stat bonus
         self.atkB = 0
         self.defB = 0
@@ -168,9 +163,3 @@ class Player(Unit):
             heal = round(heal*10)/10
             self.hp += heal
             print(self.name + " healed for " + str(heal) + " HP!")
-        
-        
-
-class Boss(Unit):
-    def Summon(EntityList):
-        pass

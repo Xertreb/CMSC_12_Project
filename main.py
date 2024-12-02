@@ -11,6 +11,7 @@ import copy as cp
 import random as rand
 
 def main():
+    func.clr()
     print("""Trivia Knight
 Turn-based Rougelike Trivia RPG
 
@@ -19,7 +20,7 @@ Turn-based Rougelike Trivia RPG
 [0] Exit
 """)
 
-    choice = func.loopValidChoice(range(0,3), "Enter Choice: ")
+    choice = func.loopValidChoice(range(0,3), text = "Enter Choice: ")
     
     if choice == 0:
         return None
@@ -28,6 +29,7 @@ Turn-based Rougelike Trivia RPG
         gameMain()
     if choice == 2:
         LoadSave()
+        gameMain()
         
 def gameLoop(category, entities, wave):
     global save, player
@@ -40,6 +42,7 @@ def gameLoop(category, entities, wave):
 
     i = 1
     while len(entities) > 0:
+        func.clr()
         print("Turn " + str(i))
         print("Turn Order")
 
@@ -117,7 +120,8 @@ def gameLoop(category, entities, wave):
                 else:
                     continue
             if player.hp <= 0:
-                return False   
+                print(player.name, "died!")
+                return False  
             input()
     
     print("Room Cleared!")
@@ -127,6 +131,7 @@ def gameLoop(category, entities, wave):
         player.hp += player.maxhp() * 0.5
         if player.hp > player.maxhp():
             player.hp = player.maxhp()
+    Save()
     input()
     return True
 
@@ -190,24 +195,69 @@ def waveStart(wave):
 def NewSave():
     global player
 
-    player_name = input("Enter Player Name: ")
-    player = cl.Player(player_name, 1)
+    a = True
+    while a:
+        player_name = input("Enter Player Name: ")
+        while input("Confirm? (y/n)") != "y":
+            player_name = input("Enter Player Name: ")
 
-def UploadSave ():
+        if ":&:" in player_name:
+            continue
+
+        try:
+            save_file = open("Saves/" + player_name + ".txt", "r")
+        except:
+            save_file = open("Saves/" + player_name + ".txt", "w")
+            a = False
+        else:
+            print("Player Name Already Taken. Choose Another.")
+            continue
+        
+        player = cl.Player(player_name, 1)
+
+    cls()
+    save_file.write(player_name+"\n")
+    save_file.write("1\n")
+    save_file.write("0\n")
+
+    save_file.close()
+
+
+def LoadSave ():
     global player
+
+    save_file = open("Saves\"" + player.name + ".txt", "r")
+    player.name = save_file.readline()
+    player.level = int(save_file.readline())
+    player.exp = int(save_file.readline())
+
+    save_file.close()
+
+def Save():
+    global player
+
+    save_file = open("Saves\""+ player.name + ".txt" ," w")
+    save_file.write(player.name + "\n")
+    save_file.write(str(player.level)+"\n")
+    save_file.write(str(player.exp)+"\n")
+    save.close()
 
 def gameMain():
     nextWave = True
     wave = 0
-    while nextWave:
+    while nextWave == True:
         wave += 1
         nextWave = waveStart(wave)
     
+    if nextWave==False:
+        leaderboard = open("Saves/leaderboard.txt","a")
+        leaderboard.write(player.name + ":&:" + wave)
 
+def leaderboard():
+    pass
+    
 
-player = cl.Player("Test", 1)
-save = None
-
+player = None
 categories, cat_txts = func.initCategories()
 
-gameMain()
+main()

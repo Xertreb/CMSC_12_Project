@@ -4,9 +4,17 @@ sys.path.insert(0, './Classes/')
 import random
 import classes as cl
 import math
+import os
+
+def clr():
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
+
 
 # minor functions
-def loopValidChoice(ran, text=''):
+def loopValidChoice(ran, text='', clear = True):
     print(text)
     x = input()
     print("\n")
@@ -14,6 +22,8 @@ def loopValidChoice(ran, text=''):
         x = input()
         print("\n")
     
+    if clear == True: 
+        clr()
     return int(x)
 
 # questions
