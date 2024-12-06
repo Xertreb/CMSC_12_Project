@@ -8,28 +8,36 @@ import functions as func
 import entities as ent
 import copy as cp
 
+import os
 import random as rand
 
 def main():
-    func.clr()
-    print("""Trivia Knight
-Turn-based Rougelike Trivia RPG
+    choice = 0
+    while choice not in [1,2]:
+        func.clr()
+        s = func.Center("Trivia Knight\nTurn-based Rougelike Trivia RPG\n\n\n" + 
+        func.TableDisplay([
+            ["[1]", "New Game"],
+            ["[2]", "Load Game"],
+            ["[3]", "Leaderboard"],
+            ["[4]", "How to Play"],
+            ["[0]", "Exit"]
+        ], [-1,-1], border = " "
+        ) + "\n\n\nEnter Choice: ", vert=True)
 
-[1] Start Game
-[2] Load Game
-[0] Exit
-""")
-
-    choice = func.loopValidChoice(range(0,3), text = "Enter Choice: ")
-    
-    if choice == 0:
-        return None
-    if choice == 1:
-        save = NewSave()
-        gameMain()
-    if choice == 2:
-        LoadSave()
-        gameMain()
+        choice = func.loopValidChoice(range(0,5), text = s)
+        
+        if choice == 0:
+            return None
+        elif choice == 1:
+            save = NewSave()
+            gameMain()
+        elif choice == 2:
+            LoadSave()
+        elif choice == 3:
+            leaderboard()
+        elif choice == 4:
+            leaderboard()
         
 def gameLoop(category, entities, wave):
     global save, player
@@ -40,35 +48,44 @@ def gameLoop(category, entities, wave):
     entities = [[x, x.spd(x.level(x.wave))] for x in entities]
     entities.sort(reverse=True, key = lambda x: x[1])
 
-    i = 1
+    turn = 1
     while len(entities) > 0:
-        func.clr()
-        print("Turn " + str(i))
+        print("Turn " + str(turn))
         print("Turn Order")
 
         # display turn order
         i = 0
         p = False
         order = []
+        disp = []
         while i < len(entities):
             if player.spd() >= entities[i][1] and not p:
                 text = "("+ str(player.hp) +"/" + str(player.maxhp()) + ")"
-                print(player.name + " (Lv. " + str(player.level)+ "): \t"  + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[:5] + text + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[-5:])
+                text = func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[:5] + text + func.ProgressBar(player.hp, player.maxhp(), len(text)+5*2)[-5:]     
+
+                r = [player.name + " (Lv. " + str(player.level)+ "):     ", text]
+                disp.append(r)
+
                 p = True
                 order.append(-1)
             else:
                 hp = entities[i][0].hp
                 mhp = entities[i][0].maxhp(entities[i][0].level(wave))
                 text = "("+ str(hp) +"/" + str(mhp) + ")"
-                print(entities[i][0].name +  " (Lv. " + str(entities[i][0].level(wave))+ "): \t"  + func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:])
+                text = func.ProgressBar(hp, mhp, len(text)+5*2)[:5] + text + func.ProgressBar(hp, mhp, len(text)+5*2)[-5:]
+
+                disp.append([entities[i][0].name +  " (Lv. " + str(entities[i][0].level(wave))+ ")   ", text])
                 i+=1
                 order.append(i)
+        
+        turn_order = func.Center("Turn " + str(turn) + "\nTurn Order\n\n"+func.TableDisplay(disp, [-1, -1], border=" "), vert = True, offsetY=(9+len(disp))//2-1)
+        actionsD = func.Center(func.TableDisplay([["[1]", "Attack"], ["[2]", "Heal"], ["[3]", "Scan"]], [-1, -1], border = " ") + "\nAction: ")
         
         # action
         actions = []
         choice1 = 0
         while choice1 not in range(1, 3):
-            choice1 = func.loopValidChoice(range(1,4), "\n[1] Attack\n[2] Heal\n[3] Scan \nAction: ")
+            choice1 = func.loopValidChoice(range(1,4), (turn_order + "\n"+actionsD))
             if choice1 == 1:
                 actions.append(choice1)
                 strDisplay = ""
@@ -123,6 +140,7 @@ def gameLoop(category, entities, wave):
                 print(player.name, "died!")
                 return False  
             input()
+        turn += 1
     
     print("Room Cleared!")
     print(player.name + " gained " + str(expG) + " EXP!")
@@ -180,14 +198,13 @@ def waveStart(wave):
     '''
 
     cats = []
-    displayStr = ""
+    displayStr = []
     for x in range(1,4):
         cats.append(rand.randint(0, len(categories)-1))
         text = cat_txts[cats[x-1]][rand.randint(0,len(cat_txts[cats[x-1]])-1)]
-        displayStr += "[" + str(x) + "] " + text + "\n"
+        displayStr.append(["[" + str(x) + "]", text + "   "])
 
-    displayStr += "Choose a Room: "
-    choice = func.loopValidChoice(range(1, 4), displayStr)
+    choice = func.loopValidChoice(range(1, 4), func.Center(func.TableDisplay(displayStr, [-1, -1], border = " ") + "\n\nChoose a Room: ", vert=True))
 
     return gameLoop(categories[cats[choice-1]], entities, wave)
     
@@ -196,12 +213,19 @@ def NewSave():
     global player
 
     a = True
+    extraD = ""
     while a:
-        player_name = input("Enter Player Name: ")
-        while input("Confirm? (y/n)") != "y":
-            player_name = input("Enter Player Name: ")
+        func.clr()
+        player_name = input(func.Center(extraD, vert = True, offsetY=4) + func.Center("\nEnter Player Name: ", offsetX = 7))
+        confirm = input(func.Center("\nConfirm? (y/n) ", offsetX=1))
+        while confirm != "y":
+            func.clr()
+            print(func.Center("Enter Player Name: ", vert = True, offsetY=3, offsetX=10) + player_name)
+            confirm = input(func.Center("\nConfirm? (y/n) ", offsetX=1))
 
+        #print(":&:" in player_name)
         if ":&:" in player_name:
+            extraD = "Player Name Contains Special Characters. Try Again.\n\n"
             continue
 
         try:
@@ -210,33 +234,64 @@ def NewSave():
             save_file = open("Saves/" + player_name + ".txt", "w")
             a = False
         else:
-            print("Player Name Already Taken. Choose Another.")
+            extraD = "Player Name Already Taken. Choose Another.\n\n"
             continue
         
         player = cl.Player(player_name, 1)
 
-    cls()
+    func.clr()
     save_file.write(player_name+"\n")
     save_file.write("1\n")
     save_file.write("0\n")
 
     save_file.close()
 
+    saves = open("Saves/saves.txt", "a")
+    if os.stat("Saves/saves.txt").st_size != 0:
+        saves.write("\n")
+    saves.write(player_name)
+    saves.close()
+
 
 def LoadSave ():
     global player
+    
+    if os.stat("Saves/saves.txt").st_size != 0:
+        saves = open("Saves\saves.txt")
+        save_list = []
 
-    save_file = open("Saves\"" + player.name + ".txt", "r")
-    player.name = save_file.readline()
-    player.level = int(save_file.readline())
-    player.exp = int(save_file.readline())
+        m = 0
+        tab = []
+        for i, x in enumerate(saves):
+            if x[-1] == "\n":
+                x = x[:-1]
+            
+            tab.append(["[" + str(i+1) + "]", x])
+            save_list.append(x)
+            m = i
 
-    save_file.close()
+        a = {1}
+        a.update(set(range(1, m+1)))
+        m = func.loopValidChoice(a, text = func.Center(func.TableDisplay(tab, [-1, -1], border = " ") + "\n\nSelect Save File: ", vert = True), clear=False) 
+
+        save_file = open("./Saves/"+save_list[m-1]+ ".txt", "r")   
+
+        player.name = save_file.readline()[:-1]
+        player.level = int(save_file.readline())
+        player.exp = int(save_file.readline())
+
+        save_file.close()
+        saves.close()
+
+        input(func.Center(player.name + "'s file loaded."))
+        gameMain()
+    else:
+        input("No Save Files Found.")
 
 def Save():
     global player
-
-    save_file = open("Saves\""+ player.name + ".txt" ," w")
+    
+    save_file = open("Saves/"+ player.name + ".txt" ,"w")
     save_file.write(player.name + "\n")
     save_file.write(str(player.level)+"\n")
     save_file.write(str(player.exp)+"\n")
@@ -250,14 +305,56 @@ def gameMain():
         nextWave = waveStart(wave)
     
     if nextWave==False:
+        # write to leaderboard
         leaderboard = open("Saves/leaderboard.txt","a")
         leaderboard.write(player.name + ":&:" + wave)
+        leaderboard.close()
+
+        #delete save file
+        os.delete("Saves/"+player.name+".txt")
+        
+        #remove from saves
+
+        saves = open("Saves/saves.txt", "r")
+        s = []
+
+        for x in saves:
+            x.replace("\n", "")
+            if x != player.name:
+                s.append(x)
+        
+        saves.close()
+        
+        saves = open("Saves/saves.txt", "w")
+        for x in s:
+            saves.write(x)
+            saves.write("\n")
+        saves.close()
+        
 
 def leaderboard():
-    pass
-    
+    leaderboard = open("Saves/leaderboard.txt")
+    func.clr()
 
-player = None
+    leadL = []
+    for x in leaderboard:
+        a = x.split(":&:")
+        a = [a[0], int(a[1])]
+        leadL.append(a)
+    
+    leaderboard.close()
+
+    leadL.sort(reverse = True,key=lambda a: a[1])
+
+    strD = [["Rank", "Player", "Wave"]]
+    for (ind,x) in enumerate(leadL):
+        strD.append([str(ind+1), x[0], str(x[1])])
+    
+    input(func.Center(func.TableDisplay(strD, [-1, -1, -1], border = "     "), vert = True, offsetX = 0) + "\n\n")
+
+player = cl.Player("", 1)
 categories, cat_txts = func.initCategories()
 
 main()
+#leaderboard()
+#func.askQuestion(rand.choice(categories), 0)

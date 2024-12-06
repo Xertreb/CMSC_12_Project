@@ -15,12 +15,14 @@ def clr():
 
 # minor functions
 def loopValidChoice(ran, text='', clear = True):
-    print(text)
-    x = input()
-    print("\n")
-    while not (x.isdigit() and int(x) in ran):
+    x = "a"
+    b = lambda x, ran: x.isdigit() and int(x) in ran
+    while not b(x, ran):
+        if clear:
+            clr()
+        if text != "":
+            print(text, end = "")
         x = input()
-        print("\n")
     
     if clear == True: 
         clr()
@@ -54,7 +56,6 @@ def initCategories():
             cat_txt[i] = []
     
     del cat_txt[len(cat_txt.keys())-1]
-#print(cat_txt)
 
     f.close()
 
@@ -79,12 +80,14 @@ def askQuestion(category, difficulty):
     q = qlist[num]
     a = alist[num]
 
-    ans = input(q + "\n")
+    print(Center(ParagraphWrap(q, 50)+ "\n\n"))
+    print(Center("", offsetX=24), end="")
+    ans = input("")
 
     fq.close()
     fa.close()
 
-    if ans == a:
+    if ans.lower() == a.lower():
         return True
     else:
         return False
@@ -104,3 +107,85 @@ def ProgressBar (v, max, size=10):
         text += " " * int(size-p1)
     text += "]"
     return text
+
+def TableDisplay(rows, sizes, border = "|"):
+    for x in range(len(rows)):
+        for y in range(len(sizes)):
+            rows[x][y] = str(rows[x][y])
+    
+    for i, x in enumerate(sizes):
+        if x == -1:
+            for y in rows:
+                sizes[i] = max(sizes[i], len(y[i]))
+    strDisplay = ""
+    for x in rows:
+        rNeeded = 1
+        for ind, y in enumerate(x):
+            rNeeded = max(rNeeded, len(str(y)) // sizes[ind])
+        
+        i = 0
+        while i < rNeeded:
+            strDisplay += border
+            j = 0
+            while j < len(sizes):
+                s = x[j][:sizes[j]]
+                s += " " * (sizes[j] - len(s))
+                x[j] = x[j][sizes[j]:]
+
+                strDisplay += s
+                strDisplay += border
+                j += 1
+            strDisplay += "\n"
+            i += 1
+    
+    return strDisplay
+
+def ParagraphWrap(text, size):
+    words = text.split(" ")
+    par = [[""]]
+
+    i = 0
+    for x in words:
+        if len(par[i][0] + " " + x) < size:
+            par[i][0] += " " + x
+        else:
+            par.append("")
+            i+=1
+            par[i][0] = x
+    
+    return TableDisplay(par, [size], border = "")
+        
+
+def Center(text, vert = False, hor = True, offsetY = 0, offsetX = 0):
+    s = text.split("\n")
+
+    cols = os.get_terminal_size().columns
+    lines = os.get_terminal_size().lines
+    disp = ""
+
+    if vert:
+        t = (lines - len(s)) // 2
+        b = (lines - len(s)) // 2
+
+        if t + b + len(s) > lines:
+            b -= 1
+        elif t + b + len(s) < lines:
+            t += 1
+        
+        disp += "\n"*(t-offsetY)
+
+    if hor: 
+        for ind, x in enumerate(s):
+            l = (cols - len(x)) // 2
+            r = (cols - len(x)) // 2
+            length = len(x)
+
+            if l + r + length > cols:
+                r -= 1
+            elif l + r + length < cols:
+                l += 1
+            
+            disp += " " * (l-offsetX) + x
+            if ind != len(s) - 1:
+                disp += "\n"
+    return disp

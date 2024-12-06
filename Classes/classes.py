@@ -99,7 +99,7 @@ class Player(Unit):
         self.hp = self.maxhp()
         self.atk = lambda: round(3*(1.05**(self.level-1)) + 0.2*self.level+2)
         self.df = lambda: round(3*((1.02)**(self.level-1))+0.05*self.level+1)
-        self.spd = lambda: round(5*((1.06)**self.level) + 0.7*self.level + 7)
+        self.spd = lambda: round(4.5*((1.06)**self.level) + 0.7*self.level + 5)
         self.exp = 0
         self.expCap = lambda: round((1.01)**self.level+ 5* self.level - 1)
                
@@ -123,14 +123,15 @@ class Player(Unit):
                 dmg = 0
             x.hp -= dmg
             x.hp = round(x.hp*10)/10
-            print(self.name, "dealt", str(dmg), "damage to " + x.name+".", sep = " ")
+            
+            print(func.Center("Success! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."))
         else:
             dmg = round(((self.atkA()*0.5) - x.defA() * 0.8 + 1)*10)/10
             if dmg <= 0:
                 dmg = 0
             x.hp -= dmg
             x.hp = round(x.hp*10)/10
-            print(self.name, "dealt", str(dmg), "damage to " + x.name+".", sep = " ")
+            print(func.Center("Blunder! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."))
     
     def GainXP(self, exp):
         self.exp += exp
