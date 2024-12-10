@@ -54,7 +54,7 @@ class Unit:
 
 
     def SetWave (self, wave):
-        self.wave = 0
+        self.wave = wave
         self.hp = self.maxhp(self.level(self.wave))
 
     def Attack(self, x, multiplier = 1):
@@ -63,8 +63,7 @@ class Unit:
             dmg = 0
         x.hp -= dmg
         x.hp = round(x.hp*10)/10
-        print(self.name, "dealt", str(dmg), "damage to " + x.name+".", sep = " ")
-        return self
+        return self.name + " dealt " + str(dmg) +  " damage to " + x.name+"."        
     
     def Heal(self, hpHealed, isPercent):
         if isPercent:
@@ -124,27 +123,35 @@ class Player(Unit):
             x.hp -= dmg
             x.hp = round(x.hp*10)/10
             
-            print(func.Center("Success! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."))
+            return "Success! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."
         else:
             dmg = round(((self.atkA()*0.5) - x.defA() * 0.8 + 1)*10)/10
             if dmg <= 0:
                 dmg = 0
             x.hp -= dmg
             x.hp = round(x.hp*10)/10
-            print(func.Center("Blunder! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."))
+            return "Blunder! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."
     
     def GainXP(self, exp):
         self.exp += exp
-        while self.expCap() < self.exp:
+        #print(self.expCap(), self.exp, self.expCap()>=self.exp)
+        st = ""
+        while self.expCap() <= self.exp:
             self.exp -= self.expCap()
             self.level += 1
             self.hp = self.maxhp()
-            print(self.name, "leveled up!")
-            print("Max HP:", self.maxhp())
-            print("ATK:", self.atk())
-            print("DEF:", self.df())
-            print("SPD:", self.spd())
-        print(self.exp, "until next level up.")
+            
+            st += self.name + " leveled up!\n"
+
+            r = []
+            r.append(["Max HP", self.maxhp()])
+            r.append(["ATK", self.atk()])
+            r.append(["DEF", self.df()])
+            r.append(["SPD", self.spd()])
+            st += func.TableDisplay(r, [-1,-1], border = " ")
+        st += str(self.expCap() - self.exp) + " until next level up."
+
+        return st
 
 
     def Heal(self, category ,diff):
@@ -156,11 +163,11 @@ class Player(Unit):
                 heal = self.maxhp() - self.hp
             heal = round(heal*10)/10
             self.hp += heal
-            print(self.name + " healed for " + str(heal) + " HP!")
+            return self.name + " healed for " + str(heal) + " HP!"
         else:
             heal = self.maxhp() * 0.05
             if heal + self.hp > self.maxhp():
                 heal = self.maxhp() - self.hp
             heal = round(heal*10)/10
             self.hp += heal
-            print(self.name + " healed for " + str(heal) + " HP!")
+            return self.name + " healed for " + str(heal) + " HP!"

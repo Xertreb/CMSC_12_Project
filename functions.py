@@ -80,7 +80,8 @@ def askQuestion(category, difficulty):
     q = qlist[num]
     a = alist[num]
 
-    print(Center(ParagraphWrap(q, 50)+ "\n\n"))
+    clr()
+    print(Center(ParagraphWrap(q, 50)+ "\n\n", vert=True))
     print(Center("", offsetX=24), end="")
     ans = input("")
 
@@ -189,3 +190,16 @@ def Center(text, vert = False, hor = True, offsetY = 0, offsetX = 0):
             if ind != len(s) - 1:
                 disp += "\n"
     return disp
+
+def QueueOutputStr(disp, apd, spc = 2):
+    disp.append(apd)
+    s = ""
+    for ind, x in enumerate(disp):
+        s += x
+        if ind + 1 != len(disp):
+            s+= "\n" * spc
+
+    clr()
+    # print(disp)
+    print(Center(s, vert= True), end="")
+    input()
