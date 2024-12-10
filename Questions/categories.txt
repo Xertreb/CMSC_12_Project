@@ -1,14 +1,4 @@
 General Knowledge
-Current Events
-Arts
-Music
-History
 Literature
-Linguistics
-Geography
-Biology
-Chemistry
-Physics
-Astronomy
+Science
 Mathematics
-Computer Science
