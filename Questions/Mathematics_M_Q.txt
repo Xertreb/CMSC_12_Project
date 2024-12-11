@@ -1,0 +1,10 @@
+In geometry, two shapes are ________ when they have exactly the same sides and angles?
+What 3D object has three sides, with two being circular congruent bases?
+_________ are numbers that extend the concept of real numbers to include imaginary numbers.
+What number system involves 10 digits, from 0-9?
+Who is the ancient Greek mathematician known as the father of geometry?
+Who proposed that no three positive numbers a, b, and c satisfy the equation a^n+b^n=c^n for n>2?
+Which principle is used to determine the number of possible outcomes of making two or more choices, and is the basis of combinatorics?
+What algebraic theorem states that every non-zero single variable polynomial with complex coefficients will have at least one complex root?
+The ______ is a tool that is used to get the rate of change of a function at a specific point.
+The ______ is a tool that is used to get the area under the curve of a function?

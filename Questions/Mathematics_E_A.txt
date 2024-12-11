@@ -1,0 +1,10 @@
+180
+360
+Variable
+Linear
+Pythagoras
+Isaac Newton
+Prime
+Pi
+Multiplication
+Exponentiation

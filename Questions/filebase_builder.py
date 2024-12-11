@@ -10,13 +10,7 @@ def builder():
     dr = "./Questions/"
     end = ".txt"
 
-    body = """a
-b
-c
-d
-e
-f
-g"""
+    body = """"""
 
     for x in categories:
         for y in c:

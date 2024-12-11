@@ -1,0 +1,10 @@
+What is the number system where numbers are classified by their divisibility by a prime number p?
+What is the study of geometric shapes with detailed structure at arbitrarily small scales?
+Who is the Indian mathematician that formalized 0 as a concept and as an operable number?
+What is the last name of the father of algebra?
+Who was the first person to develop a way to calculate pi?
+_______ arithmetic is the system of arithmetic for integers, where numbers "wrap around" back to 0 after reaching a certain number?
+What number system uses 16 digits to represent numbers, 0-9, then A-F?
+What is the conjecture that states that there is an infinite amount of prime numbers that differ by 2?
+What conjecture states that every even number greater than 2 can be expressed as the sum of two prime numbers?
+What 2D coordinate system uses two coordinates: the radial distance from the origin, and the angle between the origin and the polar axis?

@@ -1,7 +1,15 @@
-a
-b
-c
-d
-e
-f
-g
+100
+Solid
+Liquid
+Gas
+Mitochondria
+Isaac Newton
+Marie Curie
+Photosynthesis
+Homo sapiens
+Force
+Speed
+Velocity
+Constellation
+Sun
+Jupiter
