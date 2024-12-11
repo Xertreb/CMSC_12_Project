@@ -42,15 +42,6 @@ class Unit:
         self.id = id 
         self.wave = 0
         
-        # stat bonus
-        self.atkB = 0
-        self.defB = 0
-        self.spdB = 0
-
-        # actual Stats
-        self.atkA = lambda: self.atkB + self.atk(self.level(self.wave))
-        self.defA = lambda: self.defB + self.df(self.level(self.wave))
-        self.spdA = lambda: self.spdB + self.spd(self.level(self.wave))
 
 
     def SetWave (self, wave):
@@ -58,7 +49,7 @@ class Unit:
         self.hp = self.maxhp(self.level(self.wave))
 
     def Attack(self, x, multiplier = 1):
-        dmg = round(((self.atkA() * multiplier) - (x.defA() * 0.8) + 1)*10)/10
+        dmg = round(((self.atk(self.level(self.wave)) * multiplier) - (x.defA() * 0.8) + 1)*10)/10
         if dmg <= 0:
             dmg = 0
         x.hp -= dmg
@@ -80,7 +71,7 @@ class Unit:
                 self.atkB += statBonus
         elif stat == 1:
             if isPercent:
-                self.defB += self.defA()() * statBonus
+                self.defB += self.defA() * statBonus
             else:
                 self.defB += statBonus
         elif stat == 2:
@@ -117,7 +108,7 @@ class Player(Unit):
         multiplier = diffBonus[diff]
 
         if func.askQuestion(category, diff):
-            dmg = round(((self.atkA() * multiplier) - (x.defA() * 0.8) + 1)*10)/10
+            dmg = round(((self.atkA() * multiplier) - (x.df(x.level(x.wave)) * 0.8) + 1)*10)/10
             if dmg <= 0:
                 dmg = 0
             x.hp -= dmg
@@ -125,7 +116,7 @@ class Player(Unit):
             
             return "Success! "+ self.name + " dealt " + str(dmg) + " damage to " + x.name+"."
         else:
-            dmg = round(((self.atkA()*0.5) - x.defA() * 0.8 + 1)*10)/10
+            dmg = round(((self.atkA()*0.5) - x.df(x.level(x.wave)) * 0.8 + 1)*10)/10
             if dmg <= 0:
                 dmg = 0
             x.hp -= dmg

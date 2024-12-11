@@ -134,9 +134,9 @@ def gameLoop(category, entities, wave):
 
                 r = []
                 r.append(["HP", str(e.hp)+ "/" + str(e.maxhp(e.level(e.wave)))])
-                r.append(["ATK", str(e.atkA())])
-                r.append(["DEF", str(e.defA())])
-                r.append(["SPD", str(e.spdA())])
+                r.append(["ATK", str(e.atk(e.level(e.wave)))])
+                r.append(["DEF", str(e.df(e.level(e.wave)))])
+                r.append(["SPD", str(e.spd(e.level(e.wave)))])
 
                 table = func.TableDisplay(r, [-1, -1], border = " ")
                 table += "\nPress [Enter] to Continue..."
@@ -231,10 +231,14 @@ def waveStart(wave):
 
     cats = []
     displayStr = []
-    for x in range(1,4):
-        cats.append(rand.randint(0, len(categories)-1))
-        text = cat_txts[cats[x-1]][rand.randint(0,len(cat_txts[cats[x-1]])-1)]
-        displayStr.append(["[" + str(x) + "]", text + "   "])
+    i = 1
+    while len(cats) < 3:
+        r = rand.randint(0, len(categories)-1)
+        if r not in cats:
+            cats.append(r)
+            text = cat_txts[cats[i-1]][rand.randint(0,len(cat_txts[cats[i-1]])-1)]
+            displayStr.append(["[" + str(i) + "]", text + "   "])
+            i += 1
 
     choice = func.loopValidChoice(range(1, 4), func.Center("Wave "+  str(wave) + "\n\n" + func.TableDisplay(displayStr, [-1, -1], border = " ") + "\n\nChoose a Room: ", vert=True))
 
@@ -308,7 +312,7 @@ def LoadSave ():
 
         a = {1}
         a.update(set(range(1, m+1)))
-        m = func.loopValidChoice(a, text = func.Center(func.TableDisplay(tab, [-1, -1], border = " ") + "\n\nSelect Save File: ", vert = True), clear=False) 
+        m = func.loopValidChoice(a, text = func.Center(func.TableDisplay(tab, [-1, -1], border = " ") + "\n\nSelect Save File: ", vert = True), clear = True) 
 
         save_file = open("./Saves/"+save_list[m-1]+ ".txt", "r")   
 
@@ -347,7 +351,7 @@ def LoadSave ():
         save_file.close()
         saves.close()
 
-        input(func.Center("\n" + player.name + "'s file loaded."))
+        input(func.Center("\n" + player.name + "'s file loaded.", vert = True))
 
 
         gameMain(wave = wave, entities = entities, cat=category)
@@ -377,12 +381,12 @@ def Save(wave, ongoing = 0, entities = [], category = 0 ):
 
     save_file.close()
 
-def gameMain(wave = 0, entities = [], cat = ""):
+def gameMain(wave = 1, entities = [], cat = ""):
     nextWave = True
     while nextWave == True:
         if len(entities) == 0:
-            wave += 1
             nextWave = waveStart(wave)
+            wave += 1
         else:
             nextWave = gameLoop(cat, entities, wave)
             cat = ""
@@ -446,6 +450,17 @@ def leaderboard():
 player = cl.Player("", 1)
 categories, cat_txts = func.initCategories()
 
+'''
+class Test():
+    def __init__(self):
+        self.hp = 1000
+        self.name = "Test"
+        self.df = 0
+        self.defA = lambda: self.df
+
+test = Test()
+sample = cp.deepcopy(ent.normal_enemies[5])
+'''
 main()
 #leaderboard()
 #func.askQuestion(rand.choice(categories), 0)

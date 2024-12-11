@@ -39,7 +39,7 @@ def initCategories():
     f.close()
 
     categories = list(categories)
-    categories = [x[:-1] for x in categories]
+    categories = [x[:-1] if x[len(x)-1] == "\n" else x for x in categories]
 
     f = open("Questions/category_text.txt", 'r')
     
@@ -72,17 +72,23 @@ def askQuestion(category, difficulty):
     alist = []
 
     for x in fq:
-        qlist.append(x[0:-1])
+        if x[len(x)-1] == "\n":
+            qlist.append(x[0:-1])
+        else:
+            qlist.append(x)
     for x in fa:
-        alist.append(x[0:-1])
+        if x[len(x)-1] == "\n":
+            alist.append(x[0:-1])
+        else:
+            alist.append(x)
 
     num = random.randint(0, len(qlist)-1)
     q = qlist[num]
     a = alist[num]
 
     clr()
-    print(Center(ParagraphWrap(q, 50)+ "\n\n", vert=True))
-    print(Center("", offsetX=24), end="")
+    print(Center(ParagraphWrap(q, 50)+ "\n", vert=True))
+    print(Center("", offsetX=25), end="")
     ans = input("")
 
     fq.close()
@@ -91,6 +97,10 @@ def askQuestion(category, difficulty):
     if ans.lower() == a.lower():
         return True
     else:
+        clr()
+        print(Center(ParagraphWrap(q, 50)+ "\n", vert=True))
+        print(Center(ans, offsetX=20), end="\n\n")
+        input(Center("Sorry! The correct answer was " + a+ "!"))
         return False
 
 def ProgressBar (v, max, size=10):
@@ -147,12 +157,16 @@ def ParagraphWrap(text, size):
 
     i = 0
     for x in words:
+        #print(par)
         if len(par[i][0] + " " + x) < size:
-            par[i][0] += " " + x
+            #print(par[i])
+            st = par[i].pop(0)
+            par[i].append(0)
+            par[i][0] = st + x + " "
         else:
-            par.append("")
+            par.append([])
             i+=1
-            par[i][0] = x
+            par[i].append(x + " ")
     
     return TableDisplay(par, [size], border = "")
         
