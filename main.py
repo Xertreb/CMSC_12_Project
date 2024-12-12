@@ -122,15 +122,15 @@ def gameLoop(category, entities, wave):
                 choice = func.loopValidChoice(range(1,4), table) - 1
                 actions.append(choice)
             elif choice1 == 3:
+                r = []
                 for i in range(len(entities)):
-                    r = []
-                    r.append("[" + str(i + 1)+"]", entities[i][0].name)
+                    r.append(["[" + str(i + 1)+"]", entities[i][0].name])
 
                 table = func.TableDisplay(r, [-1, -1], border = " ") + "\nTarget: "
-                choiceScan = func.loopValidChoice(range(1, len(entities) + 1), table) -1
+                choiceScan = func.loopValidChoice(range(1, len(entities) + 1), func.Center(table, vert=True)) -1
                 
                 e = entities[choiceScan][0]
-                print(e.name)
+                disp = e.name + "\n"
 
                 r = []
                 r.append(["HP", str(e.hp)+ "/" + str(e.maxhp(e.level(e.wave)))])
@@ -140,7 +140,8 @@ def gameLoop(category, entities, wave):
 
                 table = func.TableDisplay(r, [-1, -1], border = " ")
                 table += "\nPress [Enter] to Continue..."
-                input()
+                disp += table
+                input(func.Center(disp, vert = True))
                 
 
         #actions = [choice, choiceAttack, diff]
